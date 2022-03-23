@@ -1,0 +1,44 @@
+<html>
+	<head>
+		<title>Netbanking</title>
+		<style>
+			fieldset{
+				width: 35%;
+				height: 350px;
+				border:0;
+			}
+		</style>
+	</head>
+	<body style="background-image: url('netbanking.jpg'); background-size: 750px 550px;; background-repeat: no-repeat; background-position: right;">
+		<iframe src="header.html" style="width:100%; border:0; padding:0;" scrolling="no"></iframe>
+		
+		<div>			
+			<form action="netbankingloginsuccess.html">
+				<fieldset align="left" >
+				<h3>Login Form</h3>				
+				<table style="padding:80; width:max-content;">
+					<tr>
+						<td>Username</td>
+						<td><input type="text" name="username" required></td>
+					</tr>
+					
+					<tr>
+						<td>Password</td>
+						<td><input type="password" name="password" required></td>
+					</tr>
+					
+					<tr align="center"><br>
+						<td colspan="2"><br>
+							<input type="submit" value="Login">
+							<input type="reset" value="Reset"><br>
+							<p style="font-size:14px;">Do not have account? Please <a href="signup.html" target="_top">click here</a> to register</p>
+						</td>
+					</tr>
+				</table>				
+			</form>			
+		</div>
+		
+		<iframe src="footer.html" style="width:100%; border:0; bottom:0; height:70px; position:fixed;" scrolling="no" ></iframe>
+		
+	</body>
+</html>
