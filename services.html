@@ -2,12 +2,191 @@
 	<head>
 		<title>Our Bank Pvt. Ltd.</title>
 		<style>
-		
+			.submitbtn{
+				background-color: green;
+				border:none;
+				color: white;
+				padding: 8px 10px;
+				text-align:center;
+				text-decoration:none;
+				display: inline-block;
+				font-size: 14px
+			}
 		</style>
+		<script>
+			var loanFlag = true;
+			var fdflag = true;
+			function showLoanEmiCalculatorForm(){
+				var loanemicalc = `
+					<div id="loanDiv" style="width:28%; border: 1px solid; display:block;">
+						<form name="loanform" style="margin:0">
+							<p align="center" style="margin:0">Loan Calculator</p>
+							<table style="padding:10; width:max-content; margin:0;">
+								<tr>
+									<td>Applicant Name</td>
+									<td><input type="text" name="appliName"  required></td>
+								</tr>									
+								<tr>
+									<td>Amount</td>
+									<td><input type="text" name="amount" required></td>
+								</tr>
+								<tr>
+									<td>Type</td>
+									<td>
+										<select name="loantype" onchange="updateROI()" required>
+											<option value="">-- Select an option --</option>
+											<option value="home">Home Loan</option>
+											<option value="car">Car Loan</option>
+											<option value="personal">Personal Loan</option>
+										</select>
+									</td>
+								</tr>
+								<tr>
+									<td>ROI(%)</td>
+									<td><input type="number" name="roi" disabled></td>
+								</tr>
+								<tr>
+									<td>Duration(years)</td>
+									<td><input type="number" name="duration" min="0" max="0"></td>
+								</tr>
+								<tr align="center"><br>
+									<td colspan="2"><br>
+										<input type="button" class="submitbtn" value="Calculate" onclick="calculateEmi()">
+									</td>
+								</tr>
+								<tr>
+									<td><br>EMI</td>
+									<td><br><input type="number" name="emi" disabled></td>
+								</tr>
+							</table>				
+						</form>	
+					</div>
+				`;
+				if(loanFlag){
+					document.getElementById("loanul").innerHTML = loanemicalc;
+				}else{
+					document.getElementById("loanul").innerText = "";
+				}
+				loanFlag=!loanFlag;				
+			}
+			
+			function showfdMaturityCalculator(){
+				var fdmatCalc = `
+					<div id="fdDiv" style="width:28%; border: 1px solid; display:block;">
+							<form name="fdform" style="margin:0">
+								<p align="center" style="margin:0">FD Calculator</p>
+								<table style="padding:10; width:max-content; margin:0;">
+									<tr>
+										<td>Principal Amount</td>
+										<td><input type="number" name="princAmount" required></td>
+									</tr>									
+									<tr>
+										<td>Duration</td>
+										<td><input type="number" name="duration" required onchange="calculateROIForFD()"></td>
+									</tr>
+									<tr>
+										<td>ROI(%)</td>
+										<td><input type="number" name="roi" disabled></td>
+									</tr>
+									<tr>
+									<tr align="center"><br>
+										<td colspan="2"><br>
+											<input type="button" class="submitbtn" value="Calculate" onclick="calculateMaturityAmount()">
+										</td>
+									</tr>
+									<tr>
+										<td><br>Maturity Amount</td>
+										<td><br><input type="number" name="maturityAmount" disabled></td>
+									</tr>
+								</table>				
+							</form>	
+						</div>
+				`;
+				if(fdflag){
+					document.getElementById("fdul").innerHTML = fdmatCalc;
+				}else{
+					document.getElementById("fdul").innerText = "";
+				}
+				fdflag=!fdflag;	
+			}
+			
+			function updateROI(){
+				var typeOfLoan = document.loanform.loantype.value;
+				var roi="";
+				var min=0;
+				var max=0;
+				if(typeOfLoan==="home"){
+					roi="7";
+					max=25;
+				}else if(typeOfLoan==="car"){
+					roi="9";
+					max=7;
+				}else if(typeOfLoan==="personal"){
+					roi="12";
+					max=5;
+				}else{
+					roi="";
+					max=0;
+				}
+				document.loanform.roi.value=roi;
+				document.loanform.duration.setAttribute("min",min);
+				document.loanform.duration.setAttribute("max",max);
+			}
+			
+			function calculateEmi(){
+				var p = document.loanform.amount.value;
+				var ar = document.loanform.roi.value;
+				var typeOfLoan = document.loanform.loantype.value;
+				var tniny = document.loanform.duration.value;
+				if(p!=="" && ar!=="" && typeOfLoan!="" && tniny!==""){
+					var minTenure = document.loanform.duration.getAttribute("min");
+					var maxTenure = document.loanform.duration.getAttribute("max");				
+					if(tniny>minTenure && tniny<=maxTenure){					
+						var r = (ar)/12/100;				
+						var n = tniny*12;
+						var emi = Math.round((p*r)*(Math.pow((1+r),n)/(Math.pow((1+r),n)-1))*100)/100;
+						
+						document.loanform.emi.value = emi;
+						alert("EMI calculated. Please check emi field");
+					}else{
+						alert("Please enter valid duration. Valid duration to be more than "+minTenure+" years and upto "+maxTenure+" years");
+					}
+				}else{
+					alert("Please fill all data before calculating emi");
+				}
+			}
+			
+			function calculateROIForFD(){
+				var t = document.fdform.duration.value;
+				var r = 0;
+				if(t>0 && t<=2)
+					r=5;
+				else if(t>2 && t<=5)
+					r=6;
+				else if(t>5 && t<=10)
+					r=7;
+				
+				document.fdform.roi.value = r;
+				
+			}
+			
+			function calculateMaturityAmount(){
+				var p = parseInt(document.fdform.princAmount.value);
+				var r = document.fdform.roi.value;
+				var t = document.fdform.duration.value;
+				
+				var m = Math.round(((p*r*t)/100)*100)/100;
+				m = m + p;
+				
+				document.fdform.maturityAmount.value = m;
+				
+			}
+			
+		</script>
 	</head>
-	<body style="background-image: url('services.jpg'); background-size: 900px 550px;; background-repeat: no-repeat; background-position: right;">
+	<body style="background-image: url('services.jpg'); background-size: 800px 550px;; background-repeat: no-repeat; background-position: right;">
 		<iframe src="header.html" style="width:100%; border:0; padding:0;" scrolling="no"></iframe>
-		<div style="padding:2px; font-size:20px">
+		<div style="padding:2px; font-size:20px; min-height:380px;">
 			<div >
 				<b><u>List Of Services Offered:</u></b>
 				<ol>
@@ -17,27 +196,57 @@
 						<li>Debit Card</li>
 						<li>Credit Card</li>
 					</ul>
-					<li>Loans</li>
-					<ul>
-						<li>Personal Loan</li>
-						<li>Home Loan</li>
-						<li>Business Loan</li>
-						<li>Car/Bike Loan</li>
-					</ul>
+					<li onclick="showLoanEmiCalculatorForm()"><u>Loans</u></li>
+					<ul id="loanul">
+					</ul> 
 					<li>Mutual Funds</li>
 					<ul>
 						<li>Stock Market</li>
 						<li>SIP</li>
 					</ul>
 					<li>Insurance Plans</li>
-					
+					<li onclick="showfdMaturityCalculator()"><u>Fixed Deposit</u></li>
+					<ul id="fdul">
+						<!-- <div id="fdDiv" style="width:28%; border: 1px solid; display:block;">
+							<form name="fdform" style="margin:0">
+								<p align="center" style="margin:0">FD Calculator</p>
+								<table style="padding:10; width:max-content; margin:0;">
+									<tr>
+										<td>Principal Amount</td>
+										<td><input type="number" name="princAmount" required></td>
+									</tr>									
+									<tr>
+										<td>Duration</td>
+										<td><input type="number" name="amount" required></td>
+									</tr>
+									<tr>
+										<td>ROI</td>
+										<td><input type="number" name="roi" disabled></td>
+									</tr>
+									<tr>
+										<td>Duration</td>
+										<td><input type="number" name="duration" min="0" max="0"></td>
+									</tr>
+									<tr align="center"><br>
+										<td colspan="2"><br>
+											<input type="button" class="submitbtn" value="Calculate">
+										</td>
+									</tr>
+									<tr>
+										<td><br>Maturity Amount</td>
+										<td><br><input type="number" name="maturityAmount" disabled></td>
+									</tr>
+								</table>				
+							</form>	
+						</div> -->
+					</ul>
 				</ol>
 			</div>
 			
 		</div>	
 		
 		
-		<iframe src="footer.html" style="width:100%; border:0; bottom:0; height:70px; position:fixed;" scrolling="no" ></iframe>
+		<iframe src="footer.html" style="width:100%; border:0; bottom:0; height:70px;" scrolling="no" ></iframe>
 		</div>
 	</body>
 </html>
